@@ -1,4 +1,4 @@
-import React, { useMemo } from 'react';
+import React, { useEffect, useMemo, useRef } from 'react';
 import { StyleSheet, View } from 'react-native';
 import Mapbox from '@rnmapbox/maps';
 import { Ionicons } from '@expo/vector-icons';
@@ -35,10 +35,19 @@ export function AppMap(props: {
   fitPadding?: { top: number; bottom: number; left?: number; right?: number };
   showUser?: boolean;
   onIdle?: (c: LatLng) => void;        // dùng cho chọn vị trí (kéo bản đồ, ghim cố định giữa)
+  onCenterChange?: (c: LatLng) => void; // theo thao tác kéo, kể cả khi Android không phát onMapIdle
   centerPin?: boolean;
   style?: any;
 }) {
-  const { center, zoom = 15, markers = [], route, fit, fitPadding, showUser, onIdle, centerPin, style } = props;
+  const { center, zoom = 15, markers = [], route, fit, fitPadding, showUser, onIdle, onCenterChange, centerPin, style } = props;
+  const movingFromGesture = useRef(false);
+  // Bỏ qua các tọa độ trung gian khi tìm địa chỉ/GPS chủ động di chuyển camera.
+  useEffect(() => { movingFromGesture.current = false; }, [center]);
+  // Giữ nguyên camera khi màn hình chỉ cập nhật địa chỉ hoặc kết quả tìm kiếm.
+  const centerCoordinate = useMemo(
+    () => center ? [center.lng, center.lat] : undefined,
+    [center],
+  );
   const shape = useMemo(
     () => (route && route.length > 1 ? ({ type: 'Feature', properties: {}, geometry: { type: 'LineString', coordinates: route } } as any) : null),
     [route],
@@ -65,6 +74,12 @@ export function AppMap(props: {
         scaleBarEnabled={false}
         compassEnabled={false}
         rotateEnabled={false}
+        onCameraChanged={onCenterChange ? (e) => {
+          if (e.gestures.isGestureActive) movingFromGesture.current = true;
+          const c = e.properties.center;
+          // Tiếp tục lấy tọa độ khi bản đồ trượt theo quán tính sau khi thả tay.
+          if (movingFromGesture.current) onCenterChange({ lat: c[1], lng: c[0] });
+        } : undefined}
         onMapIdle={onIdle ? (e: any) => {
           const c = e?.properties?.center;
           if (c) onIdle({ lat: c[1], lng: c[0] });
@@ -73,7 +88,7 @@ export function AppMap(props: {
         {bounds ? (
           <Mapbox.Camera bounds={bounds} animationMode="easeTo" animationDuration={700} />
         ) : center ? (
-          <Mapbox.Camera centerCoordinate={[center.lng, center.lat]} zoomLevel={zoom} animationMode="easeTo" animationDuration={600} />
+          <Mapbox.Camera centerCoordinate={centerCoordinate} zoomLevel={zoom} animationMode="easeTo" animationDuration={600} />
         ) : null}
         {showUser && <Mapbox.LocationPuck puckBearingEnabled pulsing={{ isEnabled: true }} />}
         {shape && (

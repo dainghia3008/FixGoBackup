@@ -1,6 +1,15 @@
 import { defineConfig } from 'vitest/config';
+import { fileURLToPath } from 'node:url';
 
 export default defineConfig({
+  resolve: {
+    alias: {
+      '@': fileURLToPath(new URL('./fixgo-user/src', import.meta.url)),
+      ...Object.fromEntries(['react', 'react-test-renderer', 'react-native', 'expo-router', '@expo/vector-icons', 'react-native-safe-area-context', '@rnmapbox/maps'].map((name) => [
+        name, fileURLToPath(new URL(`./fixgo-user/node_modules/${name}`, import.meta.url)),
+      ])),
+    },
+  },
   test: {
     include: ['tests/**/*.test.ts'],
     testTimeout: 60_000,

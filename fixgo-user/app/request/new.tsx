@@ -33,12 +33,18 @@ export default function NewRequest() {
   // Mặc định: vị trí hiện tại (GPS)
   useEffect(() => {
     if (useDraft.getState().loc) return;
+    let cancelled = false;
+    const ctrl = new AbortController();
     (async () => {
       const p = await getCurrentPoint();
+      if (cancelled || useDraft.getState().loc) return;
       if (!p) { setLocError(true); return; }
-      const address = (await reverseGeocode(p)) ?? `${p.lat.toFixed(5)}, ${p.lng.toFixed(5)}`;
+      const address = (await reverseGeocode(p, ctrl.signal)) ?? `${p.lat.toFixed(5)}, ${p.lng.toFixed(5)}`;
+      // Người dùng có thể đã chọn thủ công trong lúc GPS/địa chỉ đang tải.
+      if (cancelled || useDraft.getState().loc) return;
       useDraft.getState().setLoc({ ...p, address });
     })();
+    return () => { cancelled = true; ctrl.abort(); };
   }, []);
 
   const toggle = (c: string) => { setTypes((t) => (t.includes(c) ? t.filter((x) => x !== c) : [...t, c])); setErrors((e) => ({ ...e, incident_types: '' })); };

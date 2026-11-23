@@ -216,6 +216,15 @@ npm test               # = vitest run tests/core  → 113 test
 
 Bao phủ: vòng đời & ma trận hủy đơn, BR-12, chat BR-15, tính tiền & so sánh phiên bản phiếu (highlight), validation form (U-04, M-02, M-07, đánh giá, báo cáo), điều hướng theo trạng thái cho cả 2 app, **reducer xử lý toàn bộ sự kiện real-time** (kể cả sự kiện cũ không ghi đè trạng thái mới, đơn cũ không ảnh hưởng yêu cầu mới), phân lô Mapbox Matrix & lọc **tuyến đường < 5 km**, tính tiến độ/chặng dẫn đường, giảm số request gửi vị trí.
 
+Kiểm thử luồng đổi vị trí trong form cứu hộ (14 test, mô phỏng bản đồ/GPS, không cần emulator):
+
+```bash
+npm install --prefix fixgo-user
+npm run test:mobile
+```
+
+Bao phủ: chọn địa chỉ hoặc GPS rồi xác nhận ngay, kéo bản đồ kể cả khi Android không phát `onMapIdle`, quán tính sau khi thả tay, địa chỉ/GPS trả về muộn, huỷ tra cứu khi thoát màn hình, giữ dữ liệu form và gửi đúng vị trí đã chọn.
+
 ### 8.2 Test tích hợp backend – chạy trên Supabase thật
 
 > ⚠️ Test tạo/xoá người dùng và đơn thật. **Dùng một project Supabase dùng thử riêng** (tạo project thứ hai, chạy lại mục 2), không dùng project chính.

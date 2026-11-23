@@ -38,6 +38,7 @@
   },
   "devDependencies": {
     "@types/react": "*",
+    "react-test-renderer": "19.3.0",
     "typescript": "~6.0.3"
   }
 }

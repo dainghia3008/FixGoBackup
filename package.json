@@ -9,6 +9,7 @@
     "build:sql": "node scripts/build-setup-sql.mjs",
     "test": "vitest run tests/core",
     "test:core": "vitest run tests/core",
+    "test:mobile": "vitest run tests/mobile",
     "test:backend": "vitest run tests/backend",
     "test:all": "vitest run"
   },
