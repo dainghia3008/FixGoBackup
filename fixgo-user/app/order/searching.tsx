@@ -1,5 +1,5 @@
-import React, { useEffect, useRef } from 'react';
-import { Animated, Easing, Text, View } from 'react-native';
+import React from 'react';
+import { Text, View } from 'react-native';
 import { useRouter } from 'expo-router';
 import { AppMap } from '@/shared/mobile/maps';
 import { Button, Sheet } from '@/shared/mobile/ui';
@@ -12,19 +12,11 @@ export default function Searching() {
   const router = useRouter();
   const order = useCustomer((s) => s.order);
   const accepted = useCustomer((s) => s.acceptedCount);
-  const pulse = useRef(new Animated.Value(0)).current;
-  useEffect(() => {
-    Animated.loop(Animated.timing(pulse, { toValue: 1, duration: 1800, easing: Easing.out(Easing.quad), useNativeDriver: true })).start();
-  }, []);
   if (!order) return null;
-  const ring = { transform: [{ scale: pulse.interpolate({ inputRange: [0, 1], outputRange: [0.4, 2.6] }) }], opacity: pulse.interpolate({ inputRange: [0, 1], outputRange: [0.5, 0] }) };
 
   return (
     <View style={{ flex: 1 }}>
-      <AppMap center={order} zoom={15} markers={[{ id: 'me', lat: order.lat, lng: order.lng, kind: 'customer' }]} />
-      <View pointerEvents="none" style={{ position: 'absolute', top: '36%', left: 0, right: 0, alignItems: 'center' }}>
-        <Animated.View style={[{ width: 120, height: 120, borderRadius: 60, backgroundColor: colors.primary }, ring]} />
-      </View>
+      <AppMap center={order} zoom={15} markers={[{ id: 'me', lat: order.lat, lng: order.lng, kind: 'customer', pulsing: true }]} />
       <Sheet>
         <Text style={font.h2}>Đang tìm thợ…</Text>
         <Text style={[font.sub, { marginTop: 6, marginBottom: 14 }]}>

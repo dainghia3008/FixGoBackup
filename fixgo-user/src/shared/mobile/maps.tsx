@@ -1,5 +1,5 @@
 import React, { useEffect, useMemo, useRef } from 'react';
-import { StyleSheet, View } from 'react-native';
+import { Animated, Easing, StyleSheet, View } from 'react-native';
 import Mapbox from '@rnmapbox/maps';
 import { Ionicons } from '@expo/vector-icons';
 import { ENV } from './env';
@@ -8,7 +8,10 @@ import type { LatLng } from '../core/types';
 
 Mapbox.setAccessToken(ENV.MAPBOX_TOKEN);
 
-export interface MapMarker { id: string; lat: number; lng: number; kind: 'customer' | 'mechanic' | 'pin' }
+export interface MapMarker { id: string; lat: number; lng: number; kind: 'customer' | 'mechanic' | 'pin'; pulsing?: boolean }
+
+const PULSE_SIZE = 120;
+const PULSE_MAX_SCALE = 2.6;
 
 const ICON: Record<MapMarker['kind'], { name: React.ComponentProps<typeof Ionicons>['name']; bg: string }> = {
   customer: { name: 'location', bg: colors.danger },
@@ -21,6 +24,28 @@ export function MarkerBubble({ kind }: { kind: MapMarker['kind'] }) {
   return (
     <View style={[st.bubble, { backgroundColor: i.bg }]}>
       <Ionicons name={i.name} size={18} color="#fff" />
+    </View>
+  );
+}
+
+function PulsingMarkerBubble({ kind }: { kind: MapMarker['kind'] }) {
+  const pulse = useRef(new Animated.Value(0)).current;
+  useEffect(() => {
+    const animation = Animated.loop(Animated.timing(pulse, {
+      toValue: 1, duration: 1800, easing: Easing.out(Easing.quad), useNativeDriver: true,
+    }));
+    animation.start();
+    return () => animation.stop();
+  }, [pulse]);
+
+  return (
+    // Keep the annotation bounds fixed while the ring scales around the marker.
+    <View pointerEvents="none" style={st.pulsingMarker}>
+      <Animated.View style={[st.pulseRing, {
+        transform: [{ scale: pulse.interpolate({ inputRange: [0, 1], outputRange: [0.4, PULSE_MAX_SCALE] }) }],
+        opacity: pulse.interpolate({ inputRange: [0, 1], outputRange: [0.5, 0] }),
+      }]} />
+      <MarkerBubble kind={kind} />
     </View>
   );
 }
@@ -98,8 +123,8 @@ export function AppMap(props: {
           </Mapbox.ShapeSource>
         )}
         {markers.map((m) => (
-          <Mapbox.MarkerView key={m.id} id={m.id} coordinate={[m.lng, m.lat]} anchor={{ x: 0.5, y: 0.5 }}>
-            <MarkerBubble kind={m.kind} />
+          <Mapbox.MarkerView key={m.id} id={m.id} coordinate={[m.lng, m.lat]} anchor={{ x: 0.5, y: 0.5 }} allowOverlap={m.pulsing} pointerEvents={m.pulsing ? 'none' : undefined}>
+            {m.pulsing ? <PulsingMarkerBubble kind={m.kind} /> : <MarkerBubble kind={m.kind} />}
           </Mapbox.MarkerView>
         ))}
       </Mapbox.MapView>
@@ -116,6 +141,8 @@ export function AppMap(props: {
 }
 
 const st = StyleSheet.create({
+  pulsingMarker: { width: PULSE_SIZE * PULSE_MAX_SCALE, height: PULSE_SIZE * PULSE_MAX_SCALE, alignItems: 'center', justifyContent: 'center' },
+  pulseRing: { position: 'absolute', top: '50%', left: '50%', marginTop: -PULSE_SIZE / 2, marginLeft: -PULSE_SIZE / 2, width: PULSE_SIZE, height: PULSE_SIZE, borderRadius: PULSE_SIZE / 2, backgroundColor: colors.primary },
   bubble: { width: 34, height: 34, borderRadius: 17, alignItems: 'center', justifyContent: 'center', borderWidth: 2, borderColor: '#fff', ...shadowSm },
   centerPin: { position: 'absolute', top: '50%', left: '50%', marginLeft: -20, marginTop: -58, alignItems: 'center' },
   pinTail: { width: 3, height: 16, backgroundColor: colors.danger, borderRadius: 2 },
