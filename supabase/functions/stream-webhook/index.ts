@@ -1,6 +1,7 @@
 // Webhook Stream (event "message.new"): lưu nhật ký chat vào CSDL (BR-11, mục 5.5) và đẩy thông báo cho bên còn lại.
 // Cấu hình trong Stream Dashboard → Chat → Webhook URL: https://<project>.supabase.co/functions/v1/stream-webhook
 import { adminClient, env, handle, HttpError, json } from '../_shared/http.ts';
+import { resolveChatSender } from '../../../shared/core/chatIdentity.ts';
 
 async function hmacHex(secret: string, body: string): Promise<string> {
   const key = await crypto.subtle.importKey('raw', new TextEncoder().encode(secret), { name: 'HMAC', hash: 'SHA-256' }, false, ['sign']);
@@ -20,11 +21,12 @@ Deno.serve(handle(async (req) => {
   const senderId: string = ev.message.user?.id ?? ev.user?.id;
   const admin = adminClient();
   const { data: o } = await admin.from('orders').select('customer_id, mechanic_id').eq('id', orderId).maybeSingle();
-  if (!o || (senderId !== o.customer_id && senderId !== o.mechanic_id)) return json({ ok: true, skipped: true });
-  const role = senderId === o.customer_id ? 'customer' : 'mechanic';
+  const sender = o ? resolveChatSender(senderId, o) : null;
+  if (!o || !sender) return json({ ok: true, skipped: true });
+  const { role, userId } = sender;
 
   await admin.from('chat_messages').upsert({
-    order_id: orderId, sender_id: senderId, sender_role: role,
+    order_id: orderId, sender_id: userId, sender_role: role,
     content: String(ev.message.text ?? ''), stream_message_id: ev.message.id,
     created_at: ev.message.created_at ?? new Date().toISOString(),
   }, { onConflict: 'stream_message_id' });

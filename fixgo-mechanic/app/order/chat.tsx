@@ -12,5 +12,5 @@ export default function Chat() {
   const { session } = useAuth();
   const order = useMechanic((s) => s.order);
   if (!order || !session) return null;
-  return <ChatScreen orderId={order.id} userId={session.user.id} peerName={order.customer?.full_name ?? 'Khách hàng'} quickReplies={QUICK_REPLIES} readOnly={!chatOpen(order.status)} onBack={() => router.back()} />;
+  return <ChatScreen orderId={order.id} userId={session.user.id} role="mechanic" peerId={order.customer_id} peerName={order.customer?.full_name ?? 'Khách hàng'} quickReplies={QUICK_REPLIES} readOnly={!chatOpen(order.status)} onBack={() => router.back()} />;
 }

@@ -99,7 +99,7 @@ export async function submitQuote(orderId: string, diagnosis: string, lines: Dra
 
 // Tin nhắn mẫu "Đang tới ngay" (M-08)
 export async function sendQuickMessage(userId: string, orderId: string, text: string) {
-  const ch = await attachChat(userId, orderId);
+  const ch = await attachChat(userId, orderId, 'mechanic');
   await ch.sendMessage({ text });
 }
 

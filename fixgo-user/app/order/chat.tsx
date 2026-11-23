@@ -10,6 +10,6 @@ export default function Chat() {
   const router = useRouter();
   const { session } = useAuth();
   const order = useCustomer((s) => s.order);
-  if (!order || !session) return null;
-  return <ChatScreen orderId={order.id} userId={session.user.id} peerName={order.mechanic?.full_name ?? 'Thợ'} readOnly={!chatOpen(order.status)} onBack={() => router.back()} />;
+  if (!order?.mechanic_id || !session) return null;
+  return <ChatScreen orderId={order.id} userId={session.user.id} role="customer" peerId={order.mechanic_id} peerName={order.mechanic?.full_name ?? 'Thợ'} readOnly={!chatOpen(order.status)} onBack={() => router.back()} />;
 }

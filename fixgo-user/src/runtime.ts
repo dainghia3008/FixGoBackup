@@ -38,7 +38,7 @@ export function useCustomerRuntime() {
 
   // BR-15: chat chỉ tồn tại từ lúc chốt thợ đến hết sửa chữa
   useEffect(() => {
-    if (uid && order?.mechanic_id && chatOpen(order.status)) attachChat(uid, order.id).catch(() => {});
+    if (uid && order?.mechanic_id && chatOpen(order.status)) attachChat(uid, order.id, 'customer').catch(() => {});
     else detachChat();
   }, [uid, order?.id, order?.status]);
 

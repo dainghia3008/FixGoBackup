@@ -63,7 +63,7 @@ export function useMechanicRuntime() {
 
   // 4) Chat chỉ mở trong lúc xử lý đơn (BR-15)
   useEffect(() => {
-    if (uid && order && chatOpen(order.status)) attachChat(uid, order.id).catch(() => {});
+    if (uid && order && chatOpen(order.status)) attachChat(uid, order.id, 'mechanic').catch(() => {});
     else detachChat();
   }, [uid, order?.id, order?.status]);
 
