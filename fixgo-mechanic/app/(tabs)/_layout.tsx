@@ -5,7 +5,7 @@ import { colors } from '@/shared/mobile/theme';
 
 type IconName = React.ComponentProps<typeof Ionicons>['name'];
 const icon = (name: IconName, active: IconName) =>
-  ({ color, focused, size }: { color: string; focused: boolean; size: number }) => <Ionicons name={focused ? active : name} size={size} color={color} />;
+  ({ color, focused, size }: { color: unknown; focused: boolean; size: number }) => <Ionicons name={focused ? active : name} size={size} color={typeof color === 'string' ? color : colors.primary} />;
 
 export default function TabsLayout() {
   return (

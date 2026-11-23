@@ -23,6 +23,13 @@ export const ERROR_MESSAGES: Record<string, string> = {
   FORBIDDEN: 'Bạn không có quyền thực hiện thao tác này.',
   REPORT_NOT_ALLOWED: 'Không thể gửi báo cáo cho đơn này.',
   CHAT_CLOSED: 'Cuộc trò chuyện đã kết thúc.',
+  AI_UNAVAILABLE: 'Dịch vụ AI đang quá tải. Vui lòng thử lại sau ít phút.',
+  AI_TIMEOUT: 'AI phản hồi quá lâu. Vui lòng thử lại.',
+  AI_RATE_LIMITED: 'Dịch vụ AI đã chạm giới hạn lượt sử dụng. Vui lòng thử lại sau.',
+  AI_NOT_CONFIGURED: 'Dịch vụ AI chưa được cấu hình hợp lệ. Vui lòng liên hệ quản trị viên.',
+  AI_MODEL_UNAVAILABLE: 'Model AI hiện không khả dụng. Vui lòng liên hệ quản trị viên.',
+  AI_INVALID_RESPONSE: 'AI chưa trả về kết quả đầy đủ. Vui lòng thử lại.',
+  AI_BLOCKED: 'AI không thể phân tích nội dung yêu cầu này. Hãy kiểm tra trực tiếp thông tin khách cung cấp.',
 };
 
 export function errorCode(e: unknown): string {

@@ -138,6 +138,10 @@ npx supabase functions deploy --use-api
 
 (`SUPABASE_URL`, `SUPABASE_ANON_KEY`, `SUPABASE_SERVICE_ROLE_KEY` được Supabase tự cấp cho hàm.)
 
+**Trợ lý AI:** function tự chuyển từ `gemini-flash-latest` sang `gemini-flash-lite-latest` khi model chính quá tải, giới hạn 3 lượt gọi trong 45 giây. Có thể chọn model chính/dự phòng bằng secrets `GEMINI_MODEL` và `GEMINI_FALLBACK_MODEL`. Kết quả hợp lệ được lưu trong `dispatches.ai_result`; mở lại không gọi Gemini thêm. Nếu tất cả model đều quá tải, app thông báo nguyên nhân và hiển thị danh sách kiểm tra có sẵn theo loại sự cố, ghi rõ không phải kết quả AI. Danh sách này không lưu vào cache AI; thợ có thể bấm thử phân tích lại. Lỗi cấu hình key/model được phân biệt riêng.
+
+Sau khi sửa mã AI, deploy riêng bằng `npx supabase functions deploy ai-assistant --use-api --yes`. Để xem log lỗi Gemini: `npx supabase@latest logs --remote --service functions --search Gemini --since 30m --output-format json`.
+
 **Webhook 1 – Stream → lưu nhật ký chat (BR-11) + đẩy thông báo tin nhắn:** Stream Dashboard ▸ app ▸ **Chat ▸ Overview ▸ Webhook**: URL = `https://<REF>.supabase.co/functions/v1/stream-webhook`, bật sự kiện **message.new** (có thể bật “All events”).
 
 **Webhook 2 – Database → hàng đợi thông báo đẩy + đóng chat (BR-15):** Supabase ▸ **Integrations ▸ Database Webhooks ▸ Create a new hook**:
