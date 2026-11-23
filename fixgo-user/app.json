@@ -1,0 +1,17 @@
+{
+  "expo": {
+    "name": "FixGo",
+    "slug": "fixgo-user",
+    "scheme": "fixgo-user",
+    "version": "1.0.0",
+    "orientation": "portrait",
+    "icon": "./assets/icon.png",
+    "userInterfaceStyle": "light",
+    "splash": { "image": "./assets/splash-icon.png", "resizeMode": "contain", "backgroundColor": "#00B14F" },
+    "android": {
+      "package": "com.fixgo.user",
+      "adaptiveIcon": { "foregroundImage": "./assets/adaptive-icon.png", "backgroundColor": "#00B14F" }
+    },
+    "ios": { "bundleIdentifier": "com.fixgo.user", "supportsTablet": false }
+  }
+}
